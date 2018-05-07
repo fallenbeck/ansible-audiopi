@@ -1,0 +1,78 @@
+- name: Update RaspberryPi Airplay Devices
+  hosts: all
+
+  # Ask the user for particular information needed during the update process
+  vars_prompt:
+    # We need the sudo password to execute the update
+    - name: "ansible_sudo_pass"
+      prompt: "sudo password"
+      private: true
+
+
+  tasks:
+    - name: Get old Linux kernel version
+      shell: uname -r
+      register: old_kernel
+
+    # Update the RPi's firmware using the rpi-update script
+    - name: Update RaspberryPi firmware
+      become: true
+      command: /usr/bin/rpi-update
+      register: firmware
+      ignore_errors: true
+
+    # Perform apt update
+    - name: Updating apt repositories
+      become: true
+      apt:
+        update_cache:
+
+    # Peform apt dist-upgrade and clean up afterwards
+    - name: Update all software packages installed by apt
+      become: true
+      apt:
+        upgrade: dist
+        autoclean: true
+        autoremove: true
+      register: apt
+
+    # Restart the devices only if new Linux kernel or new software has been installed
+    - name: Restarting devices
+      become: true
+      shell: nohup bash -c "sleep 2s && shutdown -r now" &)
+      when: firmware.stdout.find("already up to date") == -1 or apt.changed
+      register: reboot
+
+    # Wait for devices to reappear only if they were rebooted
+    - name: Wait for devices to finish rebooting
+      wait_for_connection:
+        timeout: 300
+        delay: 10
+      when: reboot.changed
+
+    # Get the new Linux kernel version if an update has been installed
+    - name: Get new Linux kernel version
+      shell: uname -r
+      register: new_kernel
+      when: firmware.stdout.find("already up to date") == -1
+
+    - name: Get device uptime
+      shell: uptime
+      register: uptime
+
+
+    # Inform the user
+    - name: Uptime
+      debug:
+        msg: "{{ uptime.stdout }}"
+
+    - name: Linux kernel
+      debug:
+        msg: "Updated Linux kernel version {{ old_kernel.stdout }} to version {{ new_kernel.stdout }}"
+      when: firmware.stdout.find("already up to date") == -1
+
+    - name: Linux kernel
+      debug:
+        msg: "Unchanged Linux kernel version {{ old_kernel.stdout }}"
+      when: firmware.stdout.find("already up to date") != -1
+

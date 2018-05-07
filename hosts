@@ -1,0 +1,15 @@
+# My RaspberryPi-based speakers
+[speakers]
+esszimmer
+schlafzimmer
+wohnzimmer
+
+# Devices using the HifiBerry DAC+ shield
+[dac]
+wohnzimmer
+
+# Devices using the HiFiBerry AMP2 shield
+[amp2]
+esszimmer
+schlafzimmer
+
