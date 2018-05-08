@@ -8,6 +8,9 @@ Currently I use a couple of Rasperry Pi 3+ together with either HiFiBerry AMP2 o
 ## Usage
 To run the playbooks you need at least one HiFiBerry-enabled Raspberry Pi and a working [ansible](https://www.ansible.com) installation. I will not cover the installation of ansible here but I can say that a [brew](https://brew.sh)-based installation on macOS works fine.
 
+Required ansible version: >= 2.3
+
+### Playbooks
 I will create my playbooks in the `playbooks` folder of this project. To run a playbook, use one of the default ansible commands:
 
 To update all existing devices, simply run.
