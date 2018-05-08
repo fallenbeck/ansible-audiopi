@@ -1,6 +1,12 @@
 - name: Update RaspberryPi Airplay Devices
   hosts: all
 
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full | version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
   # Ask the user for particular information needed during the update process
   vars_prompt:
     # We need the sudo password to execute the update
