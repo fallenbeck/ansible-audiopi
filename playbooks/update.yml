@@ -42,6 +42,34 @@
         autoremove: true
       register: apt
 
+    - name: Pull newest changes from shairport repository
+      git:
+        repo: https://github.com/abrasive/shairport.git
+        dest: ~/shairport
+        clone: true
+        update: true
+      register: git
+
+    - name: Configure local shairport software
+      command: ./configure
+      args:
+        chdir: ~/shairport
+      when: git.changed
+
+    - name: Build shairport
+      make:
+        chdir: ~/shairport
+      when: git.changed
+
+    - name: Install shairport
+      make:
+        chdir: ~fallenbeck/shairport # REALLY bad
+        target: install
+      become: yes
+      when: git.changed
+
+
+
     # Restart the devices only if new Linux kernel or new software has been installed
     - name: Restarting devices
       become: true
