@@ -1,0 +1,263 @@
+- name: Initially set up a Raspberry Pi with an HifiBerry shield as Airplay device
+  hosts: all
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full is version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
+
+
+  vars_prompt:
+    - name: "hostname"
+      prompt: "    Set device hostname (leave blank to skip)"
+      private: no
+
+    - name: "airplay_name"
+      prompt: "    Airplay Device Name (leave blank to skip)"
+      private: no
+
+    - name: "ssid"
+      prompt: "  Wi-fi SSID to connect (leave blank to skip)"
+      private: no
+
+    - name: "psk"
+      prompt: "Wi-fi passphrase (leave blank if none needed)"
+      private: no
+
+
+
+  tasks:
+    - name: Remove default user (if present)
+      user:
+        name: pi
+        state: absent
+        force: yes
+        remove: yes
+      become: yes
+
+    # Perform apt update
+    - name: Updating apt repositories
+      become: yes
+      apt:
+        update_cache: yes
+
+    # Peform apt dist-upgrade and clean up afterwards
+    - name: Update all software packages installed by apt
+      become: yes
+      apt:
+        upgrade: dist
+        autoclean: yes
+        autoremove: yes
+
+    - name: Install some software packages to make your life easier ;-)
+      become: true
+      apt:
+        # name: vim,git,tmux,rpi-update
+        name: vim,git,rpi-update
+
+    # Update the RPi's firmware using the rpi-update script
+    - name: Update RaspberryPi firmware
+      become: true
+      command: /usr/bin/rpi-update
+      register: firmware
+      ignore_errors: true
+
+    - name: Set host name
+      become: yes
+      hostname:
+        name: "{{ hostname }}"
+      when: hostname|default("") != ""
+
+    - name: Update /etc/hosts
+      become: yes
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127.0.0.1'
+        line: '127.0.0.1    {{ hostname }}'
+      when: hostname|default("") != ""
+
+    - name: Create WPA supplicant configuration file
+      become: yes
+      template:
+        src: files/wpa_supplicant.conf.j2
+        dest: /etc/wpa_supplicant/wpa_supplicant.conf
+        owner: root
+        group: root
+        mode: 0644
+      when: ssid|default("") != ""
+
+    - name: Configure Raspberry to boot to console
+      become: yes
+      command: systemctl set-default multi-user.target
+
+    - name: Minimize memory available for GPU
+      become: yes
+      lineinfile:
+        path: /boot/config.txt
+        regexp: '^gpu_mem='
+        line: 'gpu_mem=16'
+
+
+    # Expand the rootfs to use the complete SD card
+    # https://github.com/charleskorn/raspi-expanded-rootfs/blob/master/tasks/main.yml
+
+    # - name: Check unpartitioned space
+    #   shell: /sbin/parted /dev/mmcblk0 unit gb print free | grep 'Free Space' | tail -n1 | awk '{print $3}'
+    #   register: unpartitioned
+    #   changed_when: false
+    #   failed_when: unpartitioned.stderr != ""
+
+    - name: Expand filesystem to fill disk
+      command: raspi-config --expand-rootfs
+      # when: unpartitioned.stdout != "0.00GB"
+
+
+
+
+
+    # Configuring the RaspBerry Pi for the HifIberry shield
+    # https://www.hifiberry.com/build/documentation/configuring-linux-3-18-x/
+
+    - name: Deactivate support for default audio device
+      become: yes
+      lineinfile:
+        path: /boot/config.txt
+        state: absent
+        line: 'dtparam=audio=on'
+
+    - name: Remove any old HiFiBerry device tree overlays (if any)
+      become: yes
+      lineinfile:
+        path: /boot/config.txt
+        state: absent
+        regexp: '^dtoverlay=hifiberry'
+        # backup: yes
+
+    # - name: Determine installed HiFiBerry shield
+    #   become: yes
+    #   command: aplay -lv | grep -i hifiberry
+    #   # card 0: sndrpihifiberry [snd_rpi_hifiberry_dacplus], device 0: HiFiBerry DAC+ HiFi pcm512x-hifi-0 []
+
+    - name: Configure device tree overlay for DAC+ shield
+      become: yes
+      lineinfile:
+        path: /boot/config.txt
+        state: present
+        line: 'dtoverlay=hifiberry-dacplus'
+
+
+    # Restart the devices only if new Linux kernel or new software has been installed
+    - name: Restarting device
+      become: true
+      shell: nohup bash -c "sleep 2s && shutdown -r now" &)
+
+    # Wait for devices to reappear only if they were rebooted
+    - name: Wait for device to finish rebooting
+      wait_for_connection:
+        timeout: 300
+        delay: 10
+
+
+    # Install everything we need to get the shairport service up an running
+    # https://support.hifiberry.com/hc/en-us/articles/205385241-Mixer-controls-on-the-HiFiBerry-boards
+    - name: Install packages for Airplay
+      become: yes
+      apt:
+        name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,libshairport2,alsa-utils
+
+    - name: Create /opt/shairport
+      become: yes
+      file:
+        path: /opt/shairport
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+        # TODO: Would be better to use our current SSH user here as owner/group and remove become below
+
+    - name: Clone shairport repository
+      become: yes
+      git:
+        repo: https://github.com/abrasive/shairport.git
+        dest: /opt/shairport
+        clone: true
+        update: true
+
+    - name: Configure local shairport software
+      become: yes
+      command: ./configure
+      args:
+        chdir: /opt/shairport
+
+    - name: Build shairport
+      become: yes
+      make:
+        chdir: /opt/shairport
+
+    - name: Install shairport
+      become: yes
+      make:
+        chdir: /opt/shairport
+        target: install
+
+    - name: Copy startup script
+      become: yes
+      command: cp /opt/shairport/scripts/debian/init.d/shairport /etc/init.d/
+
+    - name: Copy configuration file
+      become: yes
+      command: cp /opt/shairport/scripts/debian/default/shairport /etc/default/
+
+    - name: Add new system user for the shairport service
+      become: yes
+      user:
+        name: shairport
+        create_home: no
+        system: yes
+        groups: audio
+        append: yes
+
+    - name: Create shairport configuration file
+      become: yes
+      template:
+        src: files/shairport.j2
+        dest: /etc/default/shairport
+        owner: root
+        group: root
+        mode: 0644
+      when: airplay_name|default("") != ""
+
+    - name: Enable shairport service after boot
+      become: yes
+      shell: update-rc.d shairport defaults
+
+    - name: Set alsa volume to 75%
+      become: yes
+      command: amixer sset Digital 75%
+
+    - name: Store alsa values
+      become: yes
+      command: alsactl store
+
+
+    - name: Restarting device
+      become: true
+      shell: nohup bash -c "sleep 2s && shutdown -r now" &)
+
+    # Wait for devices to reappear only if they were rebooted
+    - name: Wait for device to finish rebooting
+      wait_for_connection:
+        timeout: 300
+        delay: 10
+
+    - name: Get device uptime
+      shell: uptime
+      register: uptime
+
+    # Inform the user
+    - name: Uptime
+      debug:
+        msg: "{{ uptime.stdout }}"
+
