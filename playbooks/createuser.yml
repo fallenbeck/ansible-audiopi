@@ -1,0 +1,64 @@
+- name: Create local user account on Airplay device
+  hosts: all
+  remote_user: pi
+  gather_facts: no
+
+
+
+  vars_prompt:
+    - name: "username"
+      prompt: "Username of user to create"
+      private: no
+
+
+
+  tasks:
+    - name: Remove user (if present)
+      user:
+        name: "{{ username }}"
+        state: absent
+        force: yes
+        remove: yes
+      become: yes
+
+    - name: Create new user
+      user:
+        name: "{{ username }}"
+        shell: /bin/bash
+        groups: adm, dialout, cdrom, sudo, audio, video, plugdev, games, users, input, netdev, gpio, i2c, spi
+        append: yes
+      become: yes
+
+    - name: Create .ssh directory in user's home dir
+      file:
+        path: /home/{{ username }}/.ssh
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: 0755
+      become: yes
+
+    - name: Copy playbooks/files/authorized_keys file to new user's ~/.ssh directory
+      copy:
+        src: files/authorized_keys
+        dest: /home/{{ username }}/.ssh/authorized_keys
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: 0644
+      become: yes
+
+    - name: Remove user from sudoers (if existing)
+      become: yes
+      lineinfile:
+        dest: /etc/sudoers
+        state: absent
+        regexp: '^{{ username }}'
+        validate: 'visudo -cf %s'
+
+    - name: Add user to sudoers
+      become: yes
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
