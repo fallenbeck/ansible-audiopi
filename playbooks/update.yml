@@ -7,12 +7,12 @@
         that: "ansible_version.full is version_compare('2.3', '>=')"
         msg: "This playbook requires Ansible version 2.3 or greater."
 
-  # Ask the user for particular information needed during the update process
-  vars_prompt:
-    # We need the sudo password to execute the update
-    - name: "ansible_sudo_pass"
-      prompt: "sudo password"
-      private: true
+  # # Ask the user for particular information needed during the update process
+  # vars_prompt:
+  #   # We need the sudo password to execute the update
+  #   - name: "ansible_sudo_pass"
+  #     prompt: "sudo password"
+  #     private: true
 
 
   tasks:
@@ -22,57 +22,60 @@
 
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
-      become: true
-      command: /usr/bin/rpi-update
+      become: yes
+      command: rpi-update
       register: firmware
-      ignore_errors: true
+      ignore_errors: yes
 
     # Perform apt update
     - name: Updating apt repositories
-      become: true
+      become: yes
       apt:
         update_cache:
 
     # Peform apt dist-upgrade and clean up afterwards
     - name: Update all software packages installed by apt
-      become: true
+      become: yes
       apt:
         upgrade: dist
-        autoclean: true
-        autoremove: true
+        autoclean: yes
+        autoremove: yes
       register: apt
 
     - name: Pull newest changes from shairport repository
+      become: yes
       git:
         repo: https://github.com/abrasive/shairport.git
-        dest: ~/shairport
-        clone: true
-        update: true
+        dest: /opt/shairport
+        clone: yes
+        update: yes
       register: git
 
     - name: Configure local shairport software
+      become: yes
       command: ./configure
       args:
-        chdir: ~/shairport
+        chdir: /opt/shairport
       when: git.changed
 
     - name: Build shairport
+      become: yes
       make:
-        chdir: ~/shairport
+        chdir: /opt/shairport
       when: git.changed
 
     - name: Install shairport
-      make:
-        chdir: ~fallenbeck/shairport # REALLY bad
-        target: install
       become: yes
+      make:
+        chdir: /opt/shairport
+        target: install
       when: git.changed
 
 
 
     # Restart the devices only if new Linux kernel or new software has been installed
     - name: Restarting devices
-      become: true
+      become: yes
       shell: nohup bash -c "sleep 2s && shutdown -r now" &)
       when: firmware.stdout.find("already up to date") == -1 or apt.changed
       register: reboot
