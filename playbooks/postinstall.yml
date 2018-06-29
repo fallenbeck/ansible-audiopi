@@ -233,9 +233,9 @@
       become: yes
       shell: update-rc.d shairport defaults
 
-    - name: Set alsa volume to 75%
+    - name: Set alsa volume to 80%
       become: yes
-      command: amixer sset Digital 75%
+      command: amixer sset Digital 80%
 
     - name: Store alsa values
       become: yes
