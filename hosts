@@ -1,6 +1,7 @@
 # My RaspberryPi-based speakers
 [speakers]
 esszimmer
+kinderzimmer
 schlafzimmer
 wohnzimmer
 
@@ -11,5 +12,6 @@ wohnzimmer
 # Devices using the HiFiBerry AMP2 shield
 [amp2]
 esszimmer
+kinderzimmer
 schlafzimmer
 
