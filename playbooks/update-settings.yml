@@ -1,5 +1,6 @@
 - name: Update settings on RaspberryPi Airplay Devices
   hosts: all
+  gather_facts: no
 
   pre_tasks:
     - name: Check for Ansible version > 2.3
@@ -8,7 +9,11 @@
         msg: "This playbook requires Ansible version 2.3 or greater."
 
   tasks:
-    - name: Copy playbooks/files/authorized_keys file to {{ user }}'s ~/.ssh directory
+    - name: Check if playbooks/files/authorized_keys exists
+      local_action: stat path=files/authorized_keys
+      register: authorized_keys
+
+    - name: Copy playbooks/files/authorized_keys file to .ssh directory
       copy:
         src: files/authorized_keys
         dest: ~/.ssh/authorized_keys
@@ -16,11 +21,22 @@
         # owner: "{{ user }}"
         # group: "{{ user }}"
         mode: 0644
+      when: authorized_keys.stat.exists
 
-    - name: Set alsa volume to 75%
+    - name: Set alsa volume to 80%
       become: yes
-      command: amixer sset Digital 75%
+      command: amixer sset Digital 80%
 
     - name: Store alsa values
       become: yes
       command: alsactl store
+
+    - name: Get device uptime
+      shell: uptime
+      register: uptime
+
+
+    # Inform the user
+    - name: Uptime
+      debug:
+        msg: "{{ uptime.stdout }}"
