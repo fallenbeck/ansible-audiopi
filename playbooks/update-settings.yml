@@ -1,0 +1,26 @@
+- name: Update settings on RaspberryPi Airplay Devices
+  hosts: all
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full is version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
+  tasks:
+    - name: Copy playbooks/files/authorized_keys file to {{ user }}'s ~/.ssh directory
+      copy:
+        src: files/authorized_keys
+        dest: ~/.ssh/authorized_keys
+        # dest: /home/{{ user }}/.ssh/authorized_keys
+        # owner: "{{ user }}"
+        # group: "{{ user }}"
+        mode: 0644
+
+    - name: Set alsa volume to 75%
+      become: yes
+      command: amixer sset Digital 75%
+
+    - name: Store alsa values
+      become: yes
+      command: alsactl store
