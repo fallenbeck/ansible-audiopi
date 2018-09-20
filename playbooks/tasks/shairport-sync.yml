@@ -1,0 +1,110 @@
+---
+# This task installs shairport-sync as described in
+# https://github.com/mikebrady/shairport-sync/blob/master/INSTALL.md
+
+- name: Turn off WiFi power management
+  become: yes
+  shell: iwconfig wlan0 power off
+
+# Perform apt update
+- name: Updating apt repositories
+  become: yes
+  apt:
+    update_cache: yes
+  register: apt_cache
+
+- name: Install packages for shairport-sync
+  become: yes
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - build-essential
+    - xmltoman
+    - autoconf
+    - automake
+    - libtool
+    - libdaemon-dev
+    - libpopt-dev
+    - libconfig-dev
+    - libasound2-dev
+    - avahi-daemon
+    - libavahi-client-dev
+    - libssl-dev
+    # - shairplay
+    - alsa-utils
+  # when: apt_cache.changed
+
+- name: Create /opt/shairport-sync
+  become: yes
+  file:
+    path: /opt/shairport-sync
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+    # TODO: Would be better to use our current SSH user here as owner/group and remove become below
+
+- name: Clone shairport-sync repository
+  become: yes
+  git:
+    repo: https://github.com/mikebrady/shairport-sync.git
+    dest: /opt/shairport-sync
+    clone: true
+    update: true
+  register: repository
+
+- name: Run autoreconf
+  become: yes
+  command: autoreconf -fi
+  args:
+    chdir: /opt/shairport-sync
+  when: repository.changed
+
+- name: Configure shairport-sync
+  become: yes
+  command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-systemd
+  args:
+    chdir: /opt/shairport-sync
+  when: repository.changed
+
+- name: Build shairport-sync
+  become: yes
+  make:
+    chdir: /opt/shairport-sync
+  when: repository.changed
+
+- name: Install shairport-sync
+  become: yes
+  make:
+    chdir: /opt/shairport-sync
+    target: install
+  when: repository.changed
+
+- name: Set shairport-sync device name
+  set_fact:
+    shairport_name: "{{ ansible_hostname | title }}"
+
+- name: Create shairport-sync configuration file
+  become: yes
+  template:
+    src: shairport-sync.conf.j2
+    dest: /etc/shairport-sync.conf
+    owner: root
+    group: root
+    mode: 0644
+
+# - name: Copy shairport-sync configuration file
+#   become: yes
+#   copy:
+#     src: shairport-sync.conf
+#     dest: /etc/shairport-sync.conf
+#     owner: root
+#     group: root
+#     mode: 0644
+
+- name: Enable shairport-sync service
+  become: yes
+  systemd:
+    name: shairport-sync
+    enabled: yes
+    state: started

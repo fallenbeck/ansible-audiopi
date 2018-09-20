@@ -1,0 +1,20 @@
+---
+- name: Installing shairport-sync
+  hosts: all
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full is version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
+  tasks:
+    - name: Install shairport-sync
+      include_tasks: "tasks/shairport-sync.yml"
+
+    - name: Set alsa settings
+      include_tasks: "tasks/alsa.yml"
+      
+    - name: Reboot device
+      include_tasks: "tasks/reboot.yml"
+
