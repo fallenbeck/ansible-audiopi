@@ -1,0 +1,59 @@
+# Install everything we need to get the shairport service up an running
+# https://support.hifiberry.com/hc/en-us/articles/205385241-Mixer-controls-on-the-HiFiBerry-boards
+
+- name: Initially set up a Raspberry Pi with an HifiBerry shield as Airplay device
+  hosts: all
+
+  tasks:
+    - name: Disable shairport service
+      become: yes
+      shell: update-rc.d shairport disable
+      ignore_errors: yes
+    
+    - name: Remove shairport service
+      become: yes
+      shell: update-rc.d -f shairport remove
+      ignore_errors: yes
+    
+    - name: Remove startup script
+      become: yes
+      file:
+        path: /etc/init.d/shairport
+        state: absent
+    
+    - name: Remove shairport configuration file
+      become: yes
+      file: 
+        path: /etc/default/shairport
+        state: absent
+    
+    - name: Remove shairport program
+      become: yes
+      shell: find /usr -name 'shairport' -type f -delete
+    
+    - name: Remove shairport sources
+      become: yes
+      file:
+        path: /opt/shairport
+        state: absent
+    
+    - name: Remove system user for the shairport service
+      become: yes
+      user:
+        name: shairport
+        state: absent
+        force: yes
+        remove: yes
+    
+    
+    - name: Uninstall packages for Airplay
+      become: yes
+      apt:
+        name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,li    bshairport2,alsa-utils
+        autoremove: yes
+        autoclean: yes
+        purge: yes
+        state: absent
+    
+    - name: Reboot device
+      include_tasks: "reboot.yml"
