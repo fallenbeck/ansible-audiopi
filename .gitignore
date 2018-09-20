@@ -2,3 +2,4 @@
 playbooks/*.retry
 hosts
 ssh/**
+playbooks/files/**
