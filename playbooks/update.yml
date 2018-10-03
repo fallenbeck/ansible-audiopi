@@ -38,38 +38,38 @@
       become: yes
       apt:
         upgrade: dist
-        autoclean: yes
+        autoclean: no
         autoremove: yes
       register: apt
 
-    - name: Pull newest changes from shairport repository
-      become: yes
-      git:
-        repo: https://github.com/abrasive/shairport.git
-        dest: /opt/shairport
-        clone: yes
-        update: yes
-      register: git
+    # - name: Pull newest changes from shairport repository
+    #   become: yes
+    #   git:
+    #     repo: https://github.com/abrasive/shairport.git
+    #     dest: /opt/shairport
+    #     clone: yes
+    #     update: yes
+    #   register: git
 
-    - name: Configure local shairport software
-      become: yes
-      command: ./configure
-      args:
-        chdir: /opt/shairport
-      when: git.changed
+    # - name: Configure local shairport software
+    #   become: yes
+    #   command: ./configure
+    #   args:
+    #     chdir: /opt/shairport
+    #   when: git.changed
 
-    - name: Build shairport
-      become: yes
-      make:
-        chdir: /opt/shairport
-      when: git.changed
+    # - name: Build shairport
+    #   become: yes
+    #   make:
+    #     chdir: /opt/shairport
+    #   when: git.changed
 
-    - name: Install shairport
-      become: yes
-      make:
-        chdir: /opt/shairport
-        target: install
-      when: git.changed
+    # - name: Install shairport
+    #   become: yes
+    #   make:
+    #     chdir: /opt/shairport
+    #     target: install
+    #   when: git.changed
 
 
 
