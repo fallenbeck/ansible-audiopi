@@ -10,7 +10,7 @@
 
   tasks:
     - name: Restarting devices
-      include_tasks: "reboot-task.yml"
+      include_tasks: "tasks/reboot.yml"
     #   become: yes
     #   shell: nohup bash -c "sleep 2s && shutdown -r now" &)
     #   register: reboot
