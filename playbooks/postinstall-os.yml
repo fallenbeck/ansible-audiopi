@@ -51,7 +51,7 @@
       become: true
       apt:
         # name: vim,git,tmux,rpi-update
-        name: vim,git,rpi-update
+        name: vim,git,rpi-update,tmux
 
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
