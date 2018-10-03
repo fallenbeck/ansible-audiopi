@@ -93,15 +93,6 @@
     group: root
     mode: 0644
 
-# - name: Copy shairport-sync configuration file
-#   become: yes
-#   copy:
-#     src: shairport-sync.conf
-#     dest: /etc/shairport-sync.conf
-#     owner: root
-#     group: root
-#     mode: 0644
-
 - name: Enable shairport-sync service
   become: yes
   systemd:
