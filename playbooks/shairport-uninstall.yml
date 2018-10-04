@@ -55,4 +55,4 @@
         state: absent
     
     - name: Reboot device
-      include_tasks: "reboot.yml"
+      include_tasks: "tasks/reboot.yml"

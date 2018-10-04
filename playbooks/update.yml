@@ -7,13 +7,6 @@
         that: "ansible_version.full is version_compare('2.3', '>=')"
         msg: "This playbook requires Ansible version 2.3 or greater."
 
-  # # Ask the user for particular information needed during the update process
-  # vars_prompt:
-  #   # We need the sudo password to execute the update
-  #   - name: "ansible_sudo_pass"
-  #     prompt: "sudo password"
-  #     private: true
-
 
   tasks:
     - name: Get old Linux kernel version
@@ -42,66 +35,20 @@
         autoremove: yes
       register: apt
 
-    # - name: Pull newest changes from shairport repository
-    #   become: yes
-    #   git:
-    #     repo: https://github.com/abrasive/shairport.git
-    #     dest: /opt/shairport
-    #     clone: yes
-    #     update: yes
-    #   register: git
-
-    # - name: Configure local shairport software
-    #   become: yes
-    #   command: ./configure
-    #   args:
-    #     chdir: /opt/shairport
-    #   when: git.changed
-
-    # - name: Build shairport
-    #   become: yes
-    #   make:
-    #     chdir: /opt/shairport
-    #   when: git.changed
-
-    # - name: Install shairport
-    #   become: yes
-    #   make:
-    #     chdir: /opt/shairport
-    #     target: install
-    #   when: git.changed
-
+    - name: Run shairport-sync task to update repository
+      include_tasks: "tasks/shairport-sync.yml"
 
 
     # Restart the devices only if new Linux kernel or new software has been installed
-    - name: Restarting devices
-      become: yes
-      shell: nohup bash -c "sleep 2s && shutdown -r now" &)
-      when: firmware.stdout.find("already up to date") == -1 or apt.changed
-      register: reboot
+    - name: Reboot device
+      include_tasks: "tasks/reboot.yml"
 
-    # Wait for devices to reappear only if they were rebooted
-    - name: Wait for devices to finish rebooting
-      wait_for_connection:
-        timeout: 300
-        delay: 10
-      when: reboot.changed
 
     # Get the new Linux kernel version if an update has been installed
     - name: Get new Linux kernel version
       shell: uname -r
       register: new_kernel
       when: firmware.stdout.find("already up to date") == -1
-
-    - name: Get device uptime
-      shell: uptime
-      register: uptime
-
-
-    # Inform the user
-    - name: Uptime
-      debug:
-        msg: "{{ uptime.stdout }}"
 
     - name: Linux kernel
       debug:

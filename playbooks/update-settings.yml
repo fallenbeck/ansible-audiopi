@@ -27,13 +27,3 @@
     - name: Store alsa values
       become: yes
       command: alsactl store
-
-    - name: Get device uptime
-      shell: uptime
-      register: uptime
-
-
-    # Inform the user
-    - name: Uptime
-      debug:
-        msg: "{{ uptime.stdout }}"
