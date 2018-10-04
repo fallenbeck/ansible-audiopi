@@ -46,7 +46,7 @@ cat ~/.ssh/id_rsa.pub >> playbooks/files/authorized_keys
   3. Create the local user account on the Raspberry. You need the IP of the Raspberry to connect as the default user `pi`. This command will ask for the password of this user. By default, this is `raspberry`.
 
   ```sh
-ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml -v
+ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
   ```
 
    This local user account will not have a password set. It will be added to `/etc/sudoers` with the permissions do run everyting as root without needing a password. The postinstall playbook below expects this behaviour.
@@ -54,10 +54,16 @@ ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml -v
 5. If your new user account has been successfully created, you can install and configure the software needed to provide an Airplay endpoint. This postinstall playbook will also remove the Raspberry's default user for security reasons. After running this playbook you can only log in to your Raspberry by using your SSH key pair(s) that are defined in the `authorized_keys` file.
 
  ```sh
-ansible-playbook -i <IP>, playbooks/postinstall.yml -v
+ansible-playbook -i <IP>, playbooks/postinstall-os.yml
  ```
 
   If you manually set a password for the local user created earlier, you need to call this playbook with the `--ask-sudo-pass` option to make ansible aware of the password needed to use sudo.
+
+6. To install the `shairport-sync` software (and the Airplay software stack) you can run the `shairport-sync.yml` playbook. We use the `hosts` inventory file that contains the hostnames of all airplay devices. These hostnames need to be resolvable and reachable over network to connect to these devices to run the playbook's tasks.
+
+ ```sh
+ansible-playbook -i hosts playbooks/shairport-sync.yml
+ ```
 
 
 ## Playbooks
