@@ -1,8 +1,0 @@
----
-- name: Set alsa volume to 80%
-  become: yes
-  command: amixer sset Digital 80%
-
-- name: Store alsa values
-  become: yes
-  command: alsactl store
