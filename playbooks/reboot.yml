@@ -11,21 +11,3 @@
   tasks:
     - name: Restarting devices
       include_tasks: "tasks/reboot.yml"
-    #   become: yes
-    #   shell: nohup bash -c "sleep 2s && shutdown -r now" &)
-    #   register: reboot
-
-    # # Wait for devices to reappear only if they were rebooted
-    # - name: Wait for devices to finish rebooting
-    #   wait_for_connection:
-    #     timeout: 300
-    #     delay: 10
-    #   when: reboot.changed
-
-    # - name: Get device uptime
-    #   shell: uptime
-    #   register: uptime
-
-    # - name: Uptime
-    #   debug:
-    #     msg: "{{ uptime.stdout }}"

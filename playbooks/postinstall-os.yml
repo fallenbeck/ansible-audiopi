@@ -50,7 +50,6 @@
     - name: Install some software packages to make your life easier ;-)
       become: true
       apt:
-        # name: vim,git,tmux,rpi-update
         name: vim,git,rpi-update,tmux
 
     # Update the RPi's firmware using the rpi-update script
@@ -98,18 +97,9 @@
 
     # Expand the rootfs to use the complete SD card
     # https://github.com/charleskorn/raspi-expanded-rootfs/blob/master/tasks/main.yml
-
-    # - name: Check unpartitioned space
-    #   shell: /sbin/parted /dev/mmcblk0 unit gb print free | grep 'Free Space' | tail -n1 | awk '{print $3}'
-    #   register: unpartitioned
-    #   changed_when: false
-    #   failed_when: unpartitioned.stderr != ""
-
     - name: Expand filesystem to fill disk
       command: raspi-config --expand-rootfs
       # when: unpartitioned.stdout != "0.00GB"
-
-
 
 
     # Restart the devices only if new Linux kernel or new software has been installed
