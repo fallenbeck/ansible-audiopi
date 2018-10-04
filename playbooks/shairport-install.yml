@@ -1,75 +1,89 @@
+# WARNING:   This playbook is outdated and just here for the sake of
+#            completeness. 
+#            Maybe it is broken, I did not check after refactoring.
+# IMPORTANT: If you want to convert your HiFiBerry-Audioshielded RaspberryPi
+#            to an Airplay device, use the shairport-sync.yml playbook
+#            instead.
+
 # Install everything we need to get the shairport service up an running
 # https://support.hifiberry.com/hc/en-us/articles/205385241-Mixer-controls-on-the-HiFiBerry-boards
-- name: Install packages for Airplay
-  become: yes
-  apt:
-    name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,libshairport2,alsa-utils
+- name: Remove all shairport files
+  hosts: all
 
-- name: Create /opt/shairport
-  become: yes
-  file:
-    path: /opt/shairport
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-    # TODO: Would be better to use our current SSH user here as owner/group and remove become below
+  tasks:
+    - name: DEPRECATED! Do not use this playbook. Please use shairport-sync.yml instead
+      meta: end_play
 
-- name: Clone shairport repository
-  become: yes
-  git:
-    repo: https://github.com/abrasive/shairport.git
-    dest: /opt/shairport
-    clone: true
-    update: true
-
-- name: Configure local shairport software
-  become: yes
-  command: ./configure
-  args:
-    chdir: /opt/shairport
-
-- name: Build shairport
-  become: yes
-  make:
-    chdir: /opt/shairport
-
-- name: Install shairport
-  become: yes
-  make:
-    chdir: /opt/shairport
-    target: install
-
-- name: Copy startup script
-  become: yes
-  command: cp /opt/shairport/scripts/debian/init.d/shairport /etc/init.d/
-
-- name: Copy configuration file
-  become: yes
-  command: cp /opt/shairport/scripts/debian/default/shairport /etc/default/
-
-- name: Add new system user for the shairport service
-  become: yes
-  user:
-    name: shairport
-    create_home: no
-    system: yes
-    groups: audio
-    append: yes
-
-- name: Create shairport configuration file
-  become: yes
-  template:
-    src: files/shairport.j2
-    dest: /etc/default/shairport
-    owner: root
-    group: root
-    mode: 0644
-  when: airplay_name|default("") != ""
-
-- name: Enable shairport service after boot
-  become: yes
-  shell: update-rc.d shairport defaults
-
-- name: Reboot device
-  include_tasks: "reboot.yml"
+    - name: Install packages for Airplay
+      become: yes
+      apt:
+        name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,libshairport2,alsa-utils
+    
+    - name: Create /opt/shairport
+      become: yes
+      file:
+        path: /opt/shairport
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+        # TODO: Would be better to use our current SSH user here as owner/group and remove become     below
+    
+    - name: Clone shairport repository
+      become: yes
+      git:
+        repo: https://github.com/abrasive/shairport.git
+        dest: /opt/shairport
+        clone: true
+        update: true
+    
+    - name: Configure local shairport software
+      become: yes
+      command: ./configure
+      args:
+        chdir: /opt/shairport
+    
+    - name: Build shairport
+      become: yes
+      make:
+        chdir: /opt/shairport
+    
+    - name: Install shairport
+      become: yes
+      make:
+        chdir: /opt/shairport
+        target: install
+    
+    - name: Copy startup script
+      become: yes
+      command: cp /opt/shairport/scripts/debian/init.d/shairport /etc/init.d/
+    
+    - name: Copy configuration file
+      become: yes
+      command: cp /opt/shairport/scripts/debian/default/shairport /etc/default/
+    
+    - name: Add new system user for the shairport service
+      become: yes
+      user:
+        name: shairport
+        create_home: no
+        system: yes
+        groups: audio
+        append: yes
+    
+    - name: Create shairport configuration file
+      become: yes
+      template:
+        src: files/shairport.j2
+        dest: /etc/default/shairport
+        owner: root
+        group: root
+        mode: 0644
+      when: airplay_name|default("") != ""
+    
+    - name: Enable shairport service after boot
+      become: yes
+      shell: update-rc.d shairport defaults
+    
+    - name: Reboot device
+      include_tasks: "tasks/reboot.yml"

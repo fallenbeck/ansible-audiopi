@@ -1,7 +1,6 @@
-# Install everything we need to get the shairport service up an running
-# https://support.hifiberry.com/hc/en-us/articles/205385241-Mixer-controls-on-the-HiFiBerry-boards
+# Remove old shairport files (if any)
 
-- name: Initially set up a Raspberry Pi with an HifiBerry shield as Airplay device
+- name: Remove all shairport files
   hosts: all
 
   tasks:
@@ -49,7 +48,7 @@
     - name: Uninstall packages for Airplay
       become: yes
       apt:
-        name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,li    bshairport2,alsa-utils
+        name: libssl-dev,libavahi-client-dev,libasound2-dev,avahi-daemon,shairplay,libshairport-dev,libshairport2,alsa-utils
         autoremove: yes
         autoclean: yes
         purge: yes
