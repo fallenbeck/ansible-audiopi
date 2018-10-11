@@ -37,7 +37,7 @@ Required ansible version: >= 2.3
 ssh-keygen -b 8192
   ```
 		
-  2. Put your public SSH key to the `authorized_keys` file that will be copied to the Raspberry.
+  2. Put your public SSH key to the `authorized_keys` file that will be copied to the Raspberry. If you want to grant access to different users you can simply append additional public keys to this file.
 
   ```sh
 cat ~/.ssh/id_rsa.pub >> playbooks/files/authorized_keys
