@@ -1,0 +1,7 @@
+---
+- name: Updating config files of an existing shairport-sync installation
+  hosts: all
+
+  tasks:
+    - name: Update shairport-sync settings
+      include_tasks: "tasks/shairport-sync-settings.yml"
