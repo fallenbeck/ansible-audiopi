@@ -76,7 +76,7 @@
     - name: Create WPA supplicant configuration file
       become: yes
       template:
-        src: files/wpa_supplicant.conf.j2
+        src: wpa_supplicant.conf.j2
         dest: /etc/wpa_supplicant/wpa_supplicant.conf
         owner: root
         group: root
