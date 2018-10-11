@@ -14,6 +14,22 @@
 
 
   tasks:
+    - name: Check if playbooks/files/authorized_keys exists
+      local_action: stat path=files/authorized_keys
+      register: authorized_keys
+
+    - name: Handle situation that authorized_keys file does not exist
+      block:
+      
+        - name: Inform user that cannot continue if authorized_keys does not exist
+          debug:
+            msg: "Stop playbook because authorized_keys does not exist. Please create file first in playbooks/files/! Make sure that the public SSH keys of all users that need to connect exist in this file because there will be no password set for {{ username }} by default!"
+      
+        - meta: end_play
+      
+      when: authorized_keys.stat.exists == False
+
+
     - name: Remove user (if present)
       user:
         name: "{{ username }}"
@@ -39,21 +55,6 @@
         mode: 0755
       become: yes
 
-    - name: Check if playbooks/files/authorized_keys exists
-      local_action: stat path=files/authorized_keys
-      register: authorized_keys
-
-    - name: Handle situation that file does not exist
-      block:
-      
-        - name: Inform user that cannot continue if authorized_keys does not exist
-          debug:
-            msg: "Stop playbook because authorized_keys does not exist. Please create file first in playbooks/files/!"
-      
-        - meta: end_play
-      
-      when: authorized_keys.stat.exists == False
-
     - name: Copy playbooks/files/authorized_keys file to new user's ~/.ssh directory
       copy:
         src: files/authorized_keys
@@ -62,17 +63,16 @@
         group: "{{ username }}"
         mode: 0644
       become: yes
-      when: authorized_keys.stat.exists
 
-    - name: Remove user from sudoers (if existing)
-      become: yes
-      lineinfile:
-        dest: /etc/sudoers
-        state: absent
-        regexp: '^{{ username }}'
-        validate: 'visudo -cf %s'
+    # - name: Remove user from sudoers (if existing)
+    #   become: yes
+    #   lineinfile:
+    #     dest: /etc/sudoers
+    #     state: absent
+    #     regexp: '^{{ username }}'
+    #     validate: 'visudo -cf %s'
 
-    - name: Add user to sudoers
+    - name: Add user to sudoers will all permissions and NOPASSWD
       become: yes
       lineinfile:
         dest: /etc/sudoers
