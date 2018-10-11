@@ -2,10 +2,14 @@ general =
 {
   drift_tolerance_in_seconds = 0.010; // this is no longer necessary if you have updated the Pi's firmware using rpi-update (see above).
   volume_range_db = 50;
-  name = "{{ shairport_name }}"
+  name = "{{ shairport_name }}";
+  output_backend = "alsa";
+  allow_session_interruption = "yes";
 };
 
 alsa =
 {
   output_device = "default";
+  output_rate="44100";
+  output_format = "S16";
 };
