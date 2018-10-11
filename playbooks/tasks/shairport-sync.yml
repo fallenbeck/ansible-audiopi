@@ -2,6 +2,10 @@
 # This task installs shairport-sync as described in
 # https://github.com/mikebrady/shairport-sync/blob/master/INSTALL.md
 
+- name: Set shairport-sync device name
+  set_fact:
+    shairport_name: "{{ ansible_hostname | title }}"
+
 - name: Turn off WiFi power management
   become: yes
   shell: iwconfig wlan0 power off
@@ -30,9 +34,7 @@
     - avahi-daemon
     - libavahi-client-dev
     - libssl-dev
-    # - shairplay
     - alsa-utils
-  # when: apt_cache.changed
 
 - name: Create /opt/shairport-sync
   become: yes
@@ -42,7 +44,6 @@
     owner: root
     group: root
     mode: 0755
-    # TODO: Would be better to use our current SSH user here as owner/group and remove become below
 
 - name: Clone shairport-sync repository
   become: yes
@@ -80,11 +81,7 @@
     target: install
   when: repository.changed
 
-- name: Set shairport-sync device name
-  set_fact:
-    shairport_name: "{{ ansible_hostname | title }}"
-
-- name: Create shairport-sync configuration file
+- name: Write shairport-sync configuration file
   become: yes
   template:
     src: shairport-sync.conf.j2
