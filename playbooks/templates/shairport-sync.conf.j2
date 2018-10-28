@@ -1,15 +1,23 @@
 general =
 {
-  drift_tolerance_in_seconds = 0.010; // this is no longer necessary if you have updated the Pi's firmware using rpi-update (see above).
-  volume_range_db = 50;
-  name = "{{ shairport_name }}";
-  output_backend = "alsa";
-  allow_session_interruption = "no";
+    name = "{{ shairport_name }}";
+    output_backend = "alsa";
+//    resync_threshold_in_seconds = 0;
+//    audio_backend_latency_offset_in_seconds = 2.0;
+    volume_range_db = 50;
+    alac_decoder = "apple";
+    audio_backend_buffer_desired_length_in_seconds = 1.0;
 };
+
+sessioncontrol =
+{
+    allow_session_interruption = "no";
+    session_timeout = 120;
+}
 
 alsa =
 {
-  output_device = "default";
-  output_rate = "44100";
-  output_format = "S32";
+    output_device = "default";
+    output_rate = "44100";
+//    output_format = "S32";
 };
