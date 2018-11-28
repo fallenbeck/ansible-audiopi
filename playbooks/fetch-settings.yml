@@ -1,0 +1,14 @@
+- name: Fetch settings from the host(s)
+  hosts: all
+  gather_facts: no
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full is version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
+  tasks:
+    - name: Fetch authorized_keys
+      include_tasks: tasks/fetch-authorized_keys.yml
+      run_once: true

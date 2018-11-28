@@ -1,0 +1,6 @@
+---
+- name: Get authorized_keys file from .ssh
+  fetch:
+    src: .ssh/authorized_keys
+    dest: files/authorized_keys
+    flat: yes
