@@ -1,0 +1,15 @@
+---
+- name: Add cronjob to restart shairport-sync every day
+  cron:
+    month: "*"
+    weekday: "*"
+    day: "*"
+    hour: "4"
+    minute: "23"
+    job: systemctl restart shairport-sync
+    name: shairport-sync restart
+    user: root
+    cron_file: shairport-sync-restart
+    state: present
+    disabled: no
+  become: yes
