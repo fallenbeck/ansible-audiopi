@@ -1,0 +1,6 @@
+This directory contains important files that need to be copied to the
+Airplay devices.
+
+This directory must contain the following file:
+    authorized_keys         containing the public SSH keys of the accounts
+                            that should be able to log in
