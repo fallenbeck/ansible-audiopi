@@ -31,25 +31,36 @@ Required ansible version: >= 2.3
 
 4. You now need to create a local user account on the Raspberry. This account will be created without specifying a password and limiting authorization to SSH's public key method.
 
-  1. If you do not have an SSH key pair yet, you should create one:
+  1. SSH key pair
+  
+    At this point you have 2 possibilities. Either you create a new SSH key pair or you can use an already exising key pair.
+
+    1. Create new SSH key pair
+
+      If you do not have an SSH key pair yet (or if you want to use a dedicated key pair for logging in to your Airplay devices) you must create one:
 
   ```sh
-ssh-keygen -b 8192
+ssh-keygen -t ed25519 -P "" -f playbooks/files/id_ed25519
+cat playbooks/files/id_ed25519 >> playbooks/files/authorized_keys
   ```
+
+      This command will create an SSH key pair without a passphrase and put it in the playbooks/files directory and add the public key to the authorized_keys file.
 		
-  2. Put your public SSH key to the `authorized_keys` file that will be copied to the Raspberry. If you want to grant access to different users you can simply append additional public keys to this file.
+    2. Use existing key pair
+
+      Put your existing public SSH key to the `authorized_keys` file that will be copied to the Raspberry. If you want to grant access to different users you can simply append additional public keys to this file.
 
   ```sh
-cat ~/.ssh/id_rsa.pub >> playbooks/files/authorized_keys
+cat ~/.ssh/id_ed25519.pub >> playbooks/files/authorized_keys
   ```
-     
-  3. Create the local user account on the Raspberry. You need the IP of the Raspberry to connect as the default user `pi`. This command will ask for the password of this user. By default, this is `raspberry`.
 
-  ```sh
+  2. Create the local user account on the Raspberry. You need the IP of the Raspberry to connect as the default user `pi`. This command will ask for the password of this user. By default, this is `raspberry`.
+
+ ```sh
 ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
-  ```
+ ```
 
-   This local user account will not have a password set. It will be added to `/etc/sudoers` with the permissions do run everyting as root without needing a password. The postinstall playbook below expects this behaviour.
+  This local user account will not have a password set. It will be added to `/etc/sudoers` with the permissions do run everyting as root without needing a password. The postinstall playbook below expects this behaviour.
 
 5. If your new user account has been successfully created, you can install and configure the software needed to provide an Airplay endpoint. This postinstall playbook will also remove the Raspberry's default user for security reasons. After running this playbook you can only log in to your Raspberry by using your SSH key pair(s) that are defined in the `authorized_keys` file.
 
