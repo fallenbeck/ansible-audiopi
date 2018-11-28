@@ -12,6 +12,9 @@
     - name: Install shairport-sync
       include_tasks: "tasks/shairport-sync.yml"
 
+    - name: Create cronjob for nightly service restart
+      include_tasks: tasks/cronjob.yml
+
     - name: Set alsa settings
       include_tasks: "tasks/alsa.yml"
       
