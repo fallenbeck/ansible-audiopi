@@ -3,6 +3,12 @@
 - name: Remove all shairport files
   hosts: all
 
+  pre_tasks:
+    - name: Check for Ansible version > 2.4
+      assert:
+        that: "ansible_version.full is version_compare('2.4', '>=')"
+        msg: "This playbook requires Ansible version 2.4 or greater."
+
   tasks:
     - name: Disable shairport service
       become: yes
