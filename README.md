@@ -4,15 +4,19 @@ This project contains scripts and playbooks based on ansible. It is used to mana
 
 Currently I use a couple of Rasperry Pi 3+ together with either HiFiBerry AMP2 or HiFiBerry DAC+ shields. On the software side I am using the default Raspbian installation. This is important to make sure that the playbooks can run correctly.
 
-If you want to quickly set up your device, have a look at the _tl;dr_ section below. More detailed information is provided in the _Installation_  section. Below this section, you will find some information for the _Playbooks_.
+This document is structured as follows:
+1. Requirements - Brief description of the requirements to use this playbooks.
+2. tl;dr - Short list how to set up your device and what playbooks to use.
+3. Installation - More detailed installation instructions giving some information of the individual steps carried out.
+4. Playbooks - Additional information on the playbooks of this project.
+5. Troubleshooting - If you run into any problems this is the section you should look into. It will grow over time when your bug reports come in. ;-)
 
-If you experience any problems with these playbooks, have a look at the last section called _Troubleshooting_.
 
 
-## Usage
+## Requirements
 To run the playbooks you need at least one HiFiBerry-enabled Raspberry Pi and a working [ansible](https://www.ansible.com) installation. I will not cover the installation of ansible here but I can say that a [brew](https://brew.sh)-based installation on macOS works fine.
 
-*Important:* Required ansible version: >= 2.4
+Required ansible version: >= 2.4
 
 
 
