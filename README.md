@@ -10,6 +10,30 @@ To run the playbooks you need at least one HiFiBerry-enabled Raspberry Pi and a 
 
 *Important:* Required ansible version: >= 2.4
 
+## tl;dr
+
+1. Assemble the hardware.
+2. Put the Raspberry Pi's MicroSD card into a card reader connected to your computer and figure out the device to access it.
+3. Download the Raspbian ISO file.
+4. Dump the ISO to the MicroSD card, i.e. by using `scripts/install.sh`.
+5. If you did not use `install.sh` to create the MicroSD card, you need to manually install the SSH server on Raspbian.
+6. Create the file `playbooks/files/authorized_keys` containing the public SSH keys of all accounts that should be able to log into your Airplay devices.
+7. Put the MicroSD card into the Raspberry Pi, connect the Pi to your network, boot it up and find out its IP address
+8. Create a local user on the device. This will copy over the `authorized_keys` file you created above. This will be done by using the default user `pi`. You need to provide the password of this user which is usually `raspberry`.
+ ```sh
+ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
+ ```
+9. Run the postinstall playbook to configure Raspbian correctly for your device and environment. This will also remove the default system user `pi`.
+ ```sh
+ansible-playbook -i <IP>, playbooks/postinstall-os.yml
+ ```
+10. Install the `shairport-sync` software stack to Airplayify your device. If you want to fine-tune your device, have a look at the config file `playbooks/templates/shairport-sync.conf.j2`.
+ ```sh
+ansible-playbook -i hosts playbooks/shairport-sync.yml
+ ```
+
+
+
 ## Howto
 
 ### Installation of a new Airplay device
