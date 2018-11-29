@@ -1,0 +1,8 @@
+---
+- name: Get device uptime
+  shell: uptime
+  register: uptime
+
+- name: Uptime
+  debug:
+    msg: "{{ uptime.stdout }}"

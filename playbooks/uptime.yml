@@ -1,0 +1,14 @@
+- name: Get the Airplay devices' uptime
+  hosts: all
+  gather_facts: no
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.3
+      assert:
+        that: "ansible_version.full is version_compare('2.3', '>=')"
+        msg: "This playbook requires Ansible version 2.3 or greater."
+
+  tasks:
+    - name: Get uptime
+      include_tasks: tasks/uptime.yml
+
