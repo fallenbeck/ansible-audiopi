@@ -8,7 +8,7 @@ Currently I use a couple of Rasperry Pi 3+ together with either HiFiBerry AMP2 o
 ## Usage
 To run the playbooks you need at least one HiFiBerry-enabled Raspberry Pi and a working [ansible](https://www.ansible.com) installation. I will not cover the installation of ansible here but I can say that a [brew](https://brew.sh)-based installation on macOS works fine.
 
-Required ansible version: >= 2.3
+*Important:* Required ansible version: >= 2.4
 
 ## Howto
 
@@ -97,4 +97,37 @@ If you want to run a playbook on a single device, you can provide a list instead
 ```sh
 ansible-playbook --inventory "esszimmer," playbooks/update.yml
 ```
+
+
+## Troubleshooting
+
+### ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
+
+If you try to execute a playbook using ansible version <= 2.4 you will run into the following error:
+```sh
+$ ansible-playbook -i hosts -v playbooks/fetch-settings.yml 
+Using /etc/ansible/ansible.cfg as config file
+ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
+
+The error appears to have been in '/home/fallenbeck/src/ansible-audiopi/playbooks/fetch-settings.yml': line 12, column 7, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+    - name: Fetch authorized_keys
+      ^ here
+
+
+The error appears to have been in '/home/fallenbeck/src/ansible-audiopi/playbooks/fetch-settings.yml': line 12, column 7, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  tasks:
+    - name: Fetch authorized_keys
+      ^ here
+```
+
+This is because the `include_tasks` module used in these playbooks were introduced by ansible 2.4. You cannot execute these playbooks with older ansible versions.
 
