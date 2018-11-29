@@ -10,95 +10,115 @@ To run the playbooks you need at least one HiFiBerry-enabled Raspberry Pi and a 
 
 *Important:* Required ansible version: >= 2.4
 
+
+
 ## tl;dr
 
 1. Assemble the hardware.
 2. Put the Raspberry Pi's MicroSD card into a card reader connected to your computer and figure out the device to access it.
-3. Download the Raspbian ISO file.
+3. Download the [Raspbian ISO file](https://www.raspberrypi.org/downloads/raspbian/).
 4. Dump the ISO to the MicroSD card, i.e. by using `scripts/install.sh`.
 5. If you did not use `install.sh` to create the MicroSD card, you need to manually install the SSH server on Raspbian.
 6. Create the file `playbooks/files/authorized_keys` containing the public SSH keys of all accounts that should be able to log into your Airplay devices.
 7. Put the MicroSD card into the Raspberry Pi, connect the Pi to your network, boot it up and find out its IP address
 8. Create a local user on the device. This will copy over the `authorized_keys` file you created above. This will be done by using the default user `pi`. You need to provide the password of this user which is usually `raspberry`.
- ```sh
-ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
- ```
-9. Run the postinstall playbook to configure Raspbian correctly for your device and environment. This will also remove the default system user `pi`.
- ```sh
-ansible-playbook -i <IP>, playbooks/postinstall-os.yml
- ```
-10. Install the `shairport-sync` software stack to Airplayify your device. If you want to fine-tune your device, have a look at the config file `playbooks/templates/shairport-sync.conf.j2`.
- ```sh
-ansible-playbook -i hosts playbooks/shairport-sync.yml
- ```
-
-
-
-## Howto
-
-### Installation of a new Airplay device
-
-1. Insert a new (Micro-)SD card to your card reader that should become the storage of your HiFiBerry-enabled Raspberry Pi. This card should have a size of at least 4 GB if you use the lite image of Raspbian or of 8 GB if you want to use the normal image.
-
-  1. Before you start, you need to [download a Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to your computer and unzip it.
-  2. You also must know the device of the SD card in your card reader, i.e. `/dev/disk12` on a Darwin system or `/dev/mmcblk0` on a Linux system.
-
-2. Run the setup script to install the Raspbian image to your SD card, e.g.
- 
- ```sh
-./scripts/install.sh -i ~/Downloads/2018-04-18-raspbian-stretch-lite.img -d /dev/disk12
- ```
-
- Follow the instructions on the screen to complete the Raspbian installation.
-
-3. Put the SD card into your Raspberry and connect it to your ethernet (using a cable). Power the Rasperry on. Find out the IP address of your litte computer.
-
-4. You now need to create a local user account on the Raspberry. This account will be created without specifying a password and limiting authorization to SSH's public key method.
-
-  1. SSH key pair
-  
-    At this point you have 2 possibilities. Either you create a new SSH key pair or you can use an already exising key pair.
-
-    1. Create new SSH key pair
-
-      If you do not have an SSH key pair yet (or if you want to use a dedicated key pair for logging in to your Airplay devices) you must create one:
-
   ```sh
+ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
+  ```
+
+9. Run the postinstall playbook to configure Raspbian correctly for your device and environment. This will also remove the default system user `pi`.
+  ```sh
+ansible-playbook -i <IP>, playbooks/postinstall-os.yml
+  ```
+
+10. Install the `shairport-sync` software stack to Airplayify your device. If you want to fine-tune your device, have a look at the config file `playbooks/templates/shairport-sync.conf.j2`.
+  ```sh
+ansible-playbook -i hosts playbooks/shairport-sync.yml
+  ```
+
+
+
+## Installation
+
+If you want to better understand what actions are carried out by the playbooks, this section will provide you with further information. I also recommend having a look at the playbook files in the `playbooks/` folder.
+
+### Install Raspbian
+
+Insert a new (Micro-)SD card to your card reader that should become the storage of your HiFiBerry-enabled Raspberry Pi. This card should have a size of at least 4 GB if you use the lite image of Raspbian or of 8 GB if you want to use the normal image.
+
+Before you start, you need to [download a Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to your computer and unzip it.
+
+You also must know the device of the SD card in your card reader, i.e. `/dev/disk12` on a Darwin system or `/dev/mmcblk0` on a Linux system.
+
+Run the setup script to install the Raspbian image to your SD card, e.g.
+ 
+```sh
+./scripts/install.sh -i ~/Downloads/2018-04-18-raspbian-stretch-lite.img -d /dev/disk12
+```
+
+Follow the instructions on the screen to complete the Raspbian installation.
+
+
+### Power on the Rasbperry Pi and connect it to the network
+
+Put the SD card into your Raspberry and connect it to your ethernet (using a cable). Power the Rasperry on. Find out the IP address of your litte computer.
+
+
+### SSH keys
+
+You now need to create a local user account on the Raspberry. This account will be created without specifying a password and limiting authorization to SSH's public key method.
+
+At this point you have 2 possibilities. Either you create a new SSH key pair or you can use an already exising key pair.
+
+#### Create new SSH key pair
+
+If you do not have an SSH key pair yet (or if you want to use a dedicated key pair for logging in to your Airplay devices) you must create one:
+
+```sh
 ssh-keygen -t ed25519 -P "" -f playbooks/files/id_ed25519
 cat playbooks/files/id_ed25519 >> playbooks/files/authorized_keys
-  ```
+```
 
-      This command will create an SSH key pair without a passphrase and put it in the playbooks/files directory and add the public key to the authorized_keys file.
-		
-    2. Use existing key pair
+This command will create an SSH key pair without a passphrase and put it in the playbooks/files directory and add the public key to the authorized_keys file.
 
-      Put your existing public SSH key to the `authorized_keys` file that will be copied to the Raspberry. If you want to grant access to different users you can simply append additional public keys to this file.
+#### Use existing key pair
 
-  ```sh
+If you already have a key pair that you want to use you need to put your existing public SSH key to the `authorized_keys` file that will be copied to the Raspberry. If you want to grant access to different users you can simply append additional public keys to this file.
+
+```sh
 cat ~/.ssh/id_ed25519.pub >> playbooks/files/authorized_keys
-  ```
+```
 
-  2. Create the local user account on the Raspberry. You need the IP of the Raspberry to connect as the default user `pi`. This command will ask for the password of this user. By default, this is `raspberry`.
+### Create local user
 
- ```sh
+Create the local user account on the Raspberry. You need the IP of the Raspberry to connect as the default user `pi`. This command will ask for the password of this user. By default, this is `raspberry`.
+
+```sh
 ansible-playbook -u pi -k -i <IP>, playbooks/createuser.yml
- ```
+```
 
-  This local user account will not have a password set. It will be added to `/etc/sudoers` with the permissions do run everyting as root without needing a password. The postinstall playbook below expects this behaviour.
+This local user account will not have a password set. It will be added to `/etc/sudoers` with the permissions do run everyting as root without needing a password. The postinstall playbook below expects this behaviour.
 
-5. If your new user account has been successfully created, you can install and configure the software needed to provide an Airplay endpoint. This postinstall playbook will also remove the Raspberry's default user for security reasons. After running this playbook you can only log in to your Raspberry by using your SSH key pair(s) that are defined in the `authorized_keys` file.
 
- ```sh
+### Configure the Raspberry for your environment
+
+If your new user account has been successfully created, you can install and configure the software needed to provide an Airplay endpoint. This postinstall playbook will also remove the Raspberry's default user for security reasons. After running this playbook you can only log in to your Raspberry by using your SSH key pair(s) that are defined in the `authorized_keys` file.
+
+```sh
 ansible-playbook -i <IP>, playbooks/postinstall-os.yml
- ```
+```
 
-  If you manually set a password for the local user created earlier, you need to call this playbook with the `--ask-sudo-pass` option to make ansible aware of the password needed to use sudo.
+If you manually set a password for the local user created earlier, you need to call this playbook with the `--ask-sudo-pass` option to make ansible aware of the password needed to use sudo.
 
-6. To install the `shairport-sync` software (and the Airplay software stack) you can run the `shairport-sync.yml` playbook. We use the `hosts` inventory file that contains the hostnames of all airplay devices. These hostnames need to be resolvable and reachable over network to connect to these devices to run the playbook's tasks.
 
- ```sh
+### shairport-sync
+
+To install the `shairport-sync` software (and the Airplay software stack) you can run the `shairport-sync.yml` playbook. We use the `hosts` inventory file that contains the hostnames of all airplay devices. These hostnames need to be resolvable and reachable over network to connect to these devices to run the playbook's tasks.
+
+```sh
 ansible-playbook -i hosts playbooks/shairport-sync.yml
- ```
+```
+
 
 
 ## Playbooks
