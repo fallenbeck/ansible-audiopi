@@ -11,10 +11,5 @@
     delay: 10
   when: reboot.changed
 
-- name: Get device uptime
-  shell: uptime
-  register: uptime
-
-- name: Uptime
-  debug:
-    msg: "{{ uptime.stdout }}"
+- name: Get uptime
+  include_tasks: uptime.yml
