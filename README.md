@@ -4,9 +4,9 @@ This project contains scripts and playbooks based on ansible. It is used to mana
 
 Currently I use a couple of Rasperry Pi 3+ together with either HiFiBerry AMP2 or HiFiBerry DAC+ shields. On the software side I am using the default Raspbian installation. This is important to make sure that the playbooks can run correctly.
 
-If you want to quickly set up your device, have a look at the _tl;dr_ section below. More detailed information is provided in the _Installation_  section. Below this section, you will find some information for the `Playbooks`.
+If you want to quickly set up your device, have a look at the _tl;dr_ section below. More detailed information is provided in the _Installation_  section. Below this section, you will find some information for the _Playbooks_.
 
-If you experience any problems with these playbooks, have a look at the last section called `Troubleshooting`.
+If you experience any problems with these playbooks, have a look at the last section called _Troubleshooting_.
 
 
 ## Usage
