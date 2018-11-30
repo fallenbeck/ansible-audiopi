@@ -156,7 +156,8 @@ ansible-playbook --inventory "esszimmer," playbooks/update.yml
 ### ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
 
 If you try to execute a playbook using ansible version <= 2.4 you will run into the following error:
-```sh
+
+```
 $ ansible-playbook -i hosts -v playbooks/fetch-settings.yml 
 Using /etc/ansible/ansible.cfg as config file
 ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
