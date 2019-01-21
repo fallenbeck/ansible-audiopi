@@ -156,7 +156,8 @@ ansible-playbook --inventory "esszimmer," playbooks/update.yml
 ### ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
 
 If you try to execute a playbook using ansible version <= 2.4 you will run into the following error:
-```sh
+
+```
 $ ansible-playbook -i hosts -v playbooks/fetch-settings.yml 
 Using /etc/ansible/ansible.cfg as config file
 ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
@@ -183,3 +184,15 @@ The offending line appears to be:
 
 This is because the `include_tasks` module used in these playbooks were introduced by ansible 2.4. You cannot execute these playbooks with older ansible versions.
 
+
+### unable to calculate the checksum of the remote file
+
+If you run into the following error, e.g. when running the `fetch-settings` playbook, your host name resolution might not work:
+
+```
+TASK [Get authorized_keys file from .ssh] *******************************************************************************************************************************************
+fatal: [esszimmer]: FAILED! => {"changed": false, "file": ".ssh/authorized_keys", "msg": "unable to calculate the checksum of the remote file"}
+  to retry, use: --limit @/Users/fallenbeck/src/ansible-audiopi/playbooks/fetch-settings.retry
+```
+
+In my case I tried to connect to `esszimmer` but this hostname could not be resolved. You should check your DNS settings or add the hostname(s) and the corresponding IP(s) to `/etc/hosts`.
