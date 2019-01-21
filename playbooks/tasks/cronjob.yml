@@ -6,10 +6,14 @@
     day: "*"
     hour: "4"
     minute: "23"
-    job: systemctl restart shairport-sync
-    name: shairport-sync restart
-    user: root
-    cron_file: shairport-sync-restart
+    # job: systemctl restart shairport-sync
+    # name: shairport-sync restart
+    # cron_file: shairport-sync-restart
+    # state: absent
+    job: shutdown -r now
+    name: shairport-sync reboot
+    cron_file: shairport-sync-reboot
     state: present
+    user: root
     disabled: no
   become: yes
