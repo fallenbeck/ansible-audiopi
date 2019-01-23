@@ -1,7 +1,11 @@
 ---
-- name: Set alsa volume to 80%
+- name: Set alsa volume (Digital) to 100%
   become: yes
-  command: amixer sset Digital 80%
+  command: amixer sset Digital 100%
+
+- name: Set alsa volume (PCM) to 100%
+  become: yes
+  command: amixer sset PCM,0 100%
 
 - name: Store alsa values
   become: yes
