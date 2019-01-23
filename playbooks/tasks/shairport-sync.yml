@@ -2,6 +2,14 @@
 # This task installs shairport-sync as described in
 # https://github.com/mikebrady/shairport-sync/blob/master/INSTALL.md
 
+- name: Stop shairport-sync service (if any)
+  become: yes
+  systemd:
+    name: shairport-sync
+    enabled: no
+    state: stopped
+  ignore_errors: yes
+
 - name: Set shairport-sync device name
   set_fact:
     shairport_name: "{{ ansible_hostname | title }}"
@@ -9,6 +17,14 @@
 - name: Turn off WiFi power management
   become: yes
   shell: iwconfig wlan0 power off
+
+- name: Turn off WiFi power management (in /etc/network/devices)
+  become: yes
+  lineinfile:
+    create: yes
+    line: 'wireless-power off'
+    path: '/etc/network/interfaces'
+    state: present
 
 # Perform apt update
 - name: Updating apt repositories
@@ -96,3 +112,5 @@
     name: shairport-sync
     enabled: yes
     state: started
+
+# EOF

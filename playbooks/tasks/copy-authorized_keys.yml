@@ -1,0 +1,13 @@
+---
+- name: Check if playbooks/files/authorized_keys exists
+  local_action: stat path=files/authorized_keys
+  register: authorized_keys
+
+- name: Copy playbooks/files/authorized_keys file to .ssh directory
+  copy:
+    src: files/authorized_keys
+    dest: ~/.ssh/authorized_keys
+    mode: 0644
+  when: authorized_keys.stat.exists
+
+# EOF

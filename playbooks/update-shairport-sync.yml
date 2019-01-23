@@ -10,4 +10,4 @@
 
   tasks:
     - name: Update shairport-sync settings
-      include_tasks: "tasks/shairport-sync-settings.yml"
+      include_tasks: "tasks/shairport-sync.yml"
