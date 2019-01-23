@@ -1,4 +1,12 @@
 ---
+- name: Remove old cronjob
+  cron:
+    name: shairport-sync restart
+    cron_file: shairport-sync-restart
+    state: absent
+    user: root
+  become: yes
+
 - name: Add cronjob to restart shairport-sync every day
   cron:
     month: "*"
@@ -10,7 +18,7 @@
     # name: shairport-sync restart
     # cron_file: shairport-sync-restart
     # state: absent
-    job: shutdown -r now
+    job: /sbin/shutdown -r now
     name: shairport-sync reboot
     cron_file: shairport-sync-reboot
     state: present
