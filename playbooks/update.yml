@@ -15,7 +15,7 @@
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
       become: yes
-      command: rpi-update
+      shell: "export SKIP_WARNING=1 && rpi-update"
       register: firmware
       ignore_errors: yes
 
