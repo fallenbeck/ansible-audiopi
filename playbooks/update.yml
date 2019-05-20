@@ -12,12 +12,17 @@
       shell: uname -r
       register: old_kernel
 
+    # - name: Set environment variable to skip warning when running rpi-update
+    #   shell: "echo $SKIP_WARNING"
+
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
       become: yes
-      command: rpi-update
+      shell: rpi-update
       register: firmware
       ignore_errors: yes
+      environment:
+        SKIP_WARNING: 1
 
     # Perform apt update
     - name: Updating apt repositories
