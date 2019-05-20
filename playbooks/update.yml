@@ -12,8 +12,6 @@
       shell: uname -r
       register: old_kernel
 
-    # - name: Set environment variable to skip warning when running rpi-update
-    #   shell: "echo $SKIP_WARNING"
 
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
@@ -24,20 +22,23 @@
       environment:
         SKIP_WARNING: 1
 
-    # Perform apt update
-    - name: Updating apt repositories
-      become: yes
-      apt:
-        update_cache: yes
 
-    # Peform apt dist-upgrade and clean up afterwards
-    - name: Update all software packages installed by apt
+    - name: Fix any local configuration issues (if any)
       become: yes
-      apt:
-        upgrade: dist
-        autoclean: no
-        autoremove: yes
-      register: apt
+      shell: dpkg --configure -a
+
+    - name: Update apt sources
+      become: yes
+      shell: apt update
+
+    - name: Update all packages via apt
+      become: yes
+      shell: apt dist-upgrade -y --fix-missing
+
+    - name: Cleanup apt
+      become: yes
+      shell: apt autoremove -y
+
 
     - name: Run shairport-sync task to update repository
       include_tasks: "tasks/shairport-sync.yml"
