@@ -12,7 +12,6 @@
       shell: uname -r
       register: old_kernel
 
-
     # Update the RPi's firmware using the rpi-update script
     - name: Update RaspberryPi firmware
       become: yes
