@@ -68,6 +68,7 @@
     dest: /opt/shairport-sync
     clone: true
     update: true
+    force: yes
   register: repository
 
 - name: Run autoreconf
