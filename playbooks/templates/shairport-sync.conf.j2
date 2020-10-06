@@ -17,10 +17,10 @@ sessioncontrol =
 
 alsa =
 {
-    output_device = "default";
-    output_rate = 44100;
-    output_format = "S32";
-    use_precision_timing = "yes";
+    output_device = "default";      // name of alsa output device. Use "shairport-sync -h" to discover ALSA hardware devices. Use "alsamixer" or "aplay" to find out the names of devices, mixers, etc.
+    output_rate = "44100";          // can be "auto", 44100, 88200, 176400 or 352800, but the device must have the capability.
+    output_format = "S32";          // can be "auto", "U8", "S8", "S16", "S16_LE", "S16_BE", "S24", "S24_LE", "S24_BE", "S24_3LE", "S24_3BE", "S32", "S32_LE" or "S32_BE" but the device must have the capability. Except where stated using (*LE or *BE), endianness matches that of the processor.
+    use_precision_timing = "auto";  // Use this optional advanced setting to control how Shairport Sync gathers timing information. When set to "auto", if the output device is a real hardware device, precision timing will be used. Choose "no" for more compatible standard timing, choose "yes" to force the use of precision timing, which may cause problems.
 };
 
 metadata =
