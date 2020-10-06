@@ -1,4 +1,11 @@
 ---
+- name: Copy asound.conf configuration file
+  become: yes
+  copy:
+    src: files/asound.conf
+    dest: /etc/asound.conf
+    mode: 0644
+
 - name: Set alsa volume (Digital) to 80%
   become: yes
   command: amixer sset Digital 80%
@@ -10,3 +17,5 @@
 - name: Store alsa values
   become: yes
   command: alsactl store
+
+# EOF
