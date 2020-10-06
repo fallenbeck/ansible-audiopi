@@ -1,6 +1,8 @@
 ---
 # This task installs shairport-sync as described in
 # https://github.com/mikebrady/shairport-sync/blob/master/INSTALL.md
+#
+# Variables used in this task are set in the group_vars/speakers file.
 
 - name: Stop shairport-sync service (if any)
   become: yes
@@ -12,7 +14,7 @@
 
 - name: Set shairport-sync device name
   set_fact:
-    shairport_name: "{{ ansible_hostname | title }}"
+    shairport_name: "{{ ansible_hostname | title }}"
 
 - name: Turn off WiFi power management
   become: yes
@@ -27,74 +29,60 @@
     state: present
 
 # Perform apt update
-- name: Updating apt repositories
+- name: Install/update apt packages needed by shairport-sync
   become: yes
   apt:
+    name: "{{ packages }}"
+    state: present
     update_cache: yes
-  register: apt_cache
 
-- name: Install packages for shairport-sync
-  become: yes
-  apt:
-    name: "{{ item }}"
-  with_items:
-    - build-essential
-    - xmltoman
-    - autoconf
-    - automake
-    - libtool
-    - libdaemon-dev
-    - libpopt-dev
-    - libconfig-dev
-    - libasound2-dev
-    - avahi-daemon
-    - libavahi-client-dev
-    - libssl-dev
-    - alsa-utils
-
-- name: Create /opt/shairport-sync
+- name: Create "{{ local_dir }}"
   become: yes
   file:
-    path: /opt/shairport-sync
+    path: "{{ local_dir }}"
     state: directory
     owner: root
     group: root
     mode: 0755
 
-- name: Clone shairport-sync repository
+- name: Clone shairport-sync release "{{ release }}" to "{{ local_dir }}"
   become: yes
   git:
-    repo: https://github.com/mikebrady/shairport-sync.git
-    dest: /opt/shairport-sync
+    repo: "{{ repository }}"
+    dest: "{{ local_dir }}"
     clone: true
     update: true
     force: yes
+    version: "{{ release }}"
   register: repository
 
 - name: Run autoreconf
   become: yes
   command: autoreconf -fi
   args:
-    chdir: /opt/shairport-sync
+    chdir: "{{ local_dir }}"
   when: repository.changed
 
+# If you need ALAC support you should read this first:
+# https://github.com/mikebrady/alac
 - name: Configure shairport-sync
   become: yes
-  command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-systemd
+  command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-metadata --with-soxr --with-systemd
+  #command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-metadata --with-soxr --with-systemd --with-apple-alac
   args:
-    chdir: /opt/shairport-sync
+    chdir: "{{ local_dir }}"
   when: repository.changed
 
 - name: Build shairport-sync
   become: yes
   make:
-    chdir: /opt/shairport-sync
+    chdir: "{{ local_dir }}"
   when: repository.changed
 
 - name: Install shairport-sync
   become: yes
   make:
-    chdir: /opt/shairport-sync
+    chdir: "{{ local_dir }}"
     target: install
   when: repository.changed
 
