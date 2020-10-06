@@ -2,22 +2,6 @@
 # This task will make sure that /var/log will be mounted on a tmpfs device
 # to prevent high write loads on the SD card of the raspberry.
 
-#- name: Ensure that tmpfs mountpoint for /tmp exists
-#  become: yes
-#  lineinfile:
-#    path: /etc/fstab
-#    regexp: '^.*/tmp.*'
-#    insertafter: '^proc'
-#    line: tmpfs  /tmp        tmpfs  defaults,noatime,nosuid,size=100m            0  0
-
-      #- name: Ensure that tmpfs mountpoint for /var/tmp exists
-      #  become: yes
-      #  lineinfile:
-      #    path: /etc/fstab
-      #    regexp: '^.*/var/tmp.*'
-      #    insertafter: '^tmpfs'
-      #    line: tmpfs  /var/tmp    tmpfs  defaults,noatime,nosuid,size=32m             0  0
-
 - name: Ensure that tmpfs mountpoint for /var/log exists
   become: yes
   lineinfile:
@@ -26,11 +10,3 @@
       #    insertafter: '^tmpfs'
     insertafter: '^proc'
     line: tmpfs  /var/log    tmpfs  defaults,noatime,nosuid,mode=0755,size=100m  0  0
-
-      #- name: Ensure that tmpfs mountpoint for /var/run exists
-      #  become: yes
-      #  lineinfile:
-      #    path: /etc/fstab
-      #    regexp: '^.*/var/run.*'
-      #    insertafter: '^tmpfs'
-      #    line: tmpfs  /var/run    tmpfs  defaults,noatime,nosuid,mode=0755,size=2m    0  0
