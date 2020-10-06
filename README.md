@@ -59,7 +59,7 @@ Before you start, you need to [download a Raspbian image](https://www.raspberryp
 You also must know the device of the SD card in your card reader, i.e. `/dev/disk12` on a Darwin system or `/dev/mmcblk0` on a Linux system.
 
 Run the setup script to install the Raspbian image to your SD card, e.g.
- 
+
 ```sh
 ./scripts/install.sh -i ~/Downloads/2018-04-18-raspbian-stretch-lite.img -d /dev/disk12
 ```
@@ -123,6 +123,8 @@ If you manually set a password for the local user created earlier, you need to c
 
 To install the `shairport-sync` software (and the Airplay software stack) you can run the `shairport-sync.yml` playbook. We use the `hosts` inventory file that contains the hostnames of all airplay devices. These hostnames need to be resolvable and reachable over network to connect to these devices to run the playbook's tasks.
 
+You can configure this playbook to some extend using the `group_vars/speakers` file.
+
 ```sh
 ansible-playbook -i hosts playbooks/shairport-sync.yml
 ```
@@ -133,7 +135,7 @@ ansible-playbook -i hosts playbooks/shairport-sync.yml
 I will create my playbooks in the `playbooks` folder of this project. To run a playbook, use one of the default ansible commands:
 
 To update all existing devices, simply run.
-```sh 
+```sh
 ansible-playbook --inventory hosts playbooks/update.yml
 ```
 
@@ -158,7 +160,7 @@ ansible-playbook --inventory "esszimmer," playbooks/update.yml
 If you try to execute a playbook using ansible version <= 2.4 you will run into the following error:
 
 ```
-$ ansible-playbook -i hosts -v playbooks/fetch-settings.yml 
+$ ansible-playbook -i hosts -v playbooks/fetch-settings.yml
 Using /etc/ansible/ansible.cfg as config file
 ERROR! no action detected in task. This often indicates a misspelled module name, or incorrect module path.
 
