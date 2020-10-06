@@ -11,7 +11,7 @@
   tasks:
     - name: Copy authorized_keys
       include_tasks: tasks/copy-authorized_keys.yml
-      
+
     - name: Update cronjob
       include_tasks: tasks/cronjob.yml
 
