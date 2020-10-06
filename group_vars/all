@@ -1,0 +1,15 @@
+---
+# Packages to be installed via apt
+# These packages will be installed an every node indepenent from its
+# particular role
+os_packages:
+    - vim
+    - git
+    - rpi-update
+    - tmux
+    - haveged
+
+# haveged:  We install this package to get rid of warnings in /var/log/syslog:
+#           > Oct  6 08:41:33 wohnzimmer wpa_supplicant[316]: random: Cannot read from /dev/random: Resource temporarily unavailable
+#           For more information please refer to
+#           https://forums.linuxmint.com/viewtopic.php?p=1838115

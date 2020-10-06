@@ -1,0 +1,10 @@
+---
+# This task updates the Raspberry Pi's firmware
+# using the rpi-update script
+- name: Update RaspberryPi firmware
+  become: yes
+  shell: rpi-update
+  register: firmware
+  ignore_errors: yes
+  environment:
+    SKIP_WARNING: 1

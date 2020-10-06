@@ -12,32 +12,12 @@
       shell: uname -r
       register: old_kernel
 
-    # Update the RPi's firmware using the rpi-update script
-    - name: Update RaspberryPi firmware
-      become: yes
-      shell: rpi-update
-      register: firmware
-      ignore_errors: yes
-      environment:
-        SKIP_WARNING: 1
 
+    - name: Update firmware
+      include_tasks: "tasks/rpi-firmware.yml"
 
-    - name: Fix any local configuration issues (if any)
-      become: yes
-      shell: dpkg --configure -a
-
-    - name: Update apt sources
-      become: yes
-      shell: apt update
-
-    - name: Update all packages via apt
-      become: yes
-      shell: apt dist-upgrade -y --fix-missing
-
-    - name: Cleanup apt
-      become: yes
-      shell: apt autoremove -y
-
+    - name: Install apt packages
+      include_tasks: "tasks/apt.yml"
 
     - name: Run shairport-sync task to update repository
       include_tasks: "tasks/shairport-sync.yml"

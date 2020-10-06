@@ -1,0 +1,25 @@
+---
+# This task updates apt and install all packages
+# defined in the group_vars/all file
+
+- name: Fix any local configuration issues (if any)
+  become: yes
+  shell: dpkg --configure -a
+
+- name: Update apt sources
+  become: yes
+  shell: apt update
+
+- name: Update all packages via apt
+  become: yes
+  shell: apt dist-upgrade -y --fix-missing
+
+- name: Install packages
+  become: yes
+  apt:
+    name: "{{ os_packages }}"
+    state: present
+
+- name: Cleanup apt
+  become: yes
+  shell: apt autoremove -y

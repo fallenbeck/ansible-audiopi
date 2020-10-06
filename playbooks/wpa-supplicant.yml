@@ -1,0 +1,14 @@
+---
+- name: Installing wpa_supplicant
+  hosts: all
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.4
+      assert:
+        that: "ansible_version.full is version_compare('2.4', '>=')"
+        msg: "This playbook requires Ansible version 2.4 or greater."
+
+  tasks:
+    - name: Install wpa_supplicant
+      include_tasks: "tasks/wpa-supplicant.yml"
+

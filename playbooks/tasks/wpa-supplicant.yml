@@ -1,0 +1,15 @@
+---
+# This task takes care of the wpa_supplicant installation
+
+- name: Create WPA supplicant configuration file
+    become: yes
+    template:
+      src: wpa_supplicant.conf.j2
+      dest: /etc/wpa_supplicant/wpa_supplicant.conf
+      owner: root
+      group: root
+      mode: 0644
+    when: ssid|default("") != ""
+
+
+# EOF

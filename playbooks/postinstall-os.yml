@@ -33,31 +33,13 @@
         remove: yes
       become: yes
 
-    # Perform apt update
-    - name: Updating apt repositories
-      become: yes
-      apt:
-        update_cache: yes
 
-    # Peform apt dist-upgrade and clean up afterwards
-    - name: Update all software packages installed by apt
-      become: yes
-      apt:
-        upgrade: dist
-        autoclean: yes
-        autoremove: yes
+    - name: Update apt and install needed packages
+      include_tasks: "tasks/apt.yml"
 
-    - name: Install some software packages to make your life easier ;-)
-      become: true
-      apt:
-        name: vim,git,rpi-update,tmux
+    - name: Update firmware
+      include_tasks: "tasks/rpi-firmware.yml"
 
-    # Update the RPi's firmware using the rpi-update script
-    - name: Update RaspberryPi firmware
-      become: true
-      command: /usr/bin/rpi-update
-      register: firmware
-      ignore_errors: true
 
     - name: Set host name
       become: yes
@@ -73,15 +55,10 @@
         line: '127.0.0.1    {{ hostname }}'
       when: hostname|default("") != ""
 
-    - name: Create WPA supplicant configuration file
-      become: yes
-      template:
-        src: wpa_supplicant.conf.j2
-        dest: /etc/wpa_supplicant/wpa_supplicant.conf
-        owner: root
-        group: root
-        mode: 0644
-      when: ssid|default("") != ""
+
+    - name: Install wpa_supplicant
+      include_tasks: "tasks/wpa-supplicant.yml"
+
 
     - name: Configure Raspberry to boot to console
       become: yes
