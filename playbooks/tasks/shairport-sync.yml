@@ -32,35 +32,35 @@
 - name: Install/update apt packages needed by shairport-sync
   become: yes
   apt:
-    name: "{{ packages }}"
+    name: "{{ shairport_packages }}"
     state: present
     update_cache: yes
 
-- name: Create "{{ local_dir }}"
+- name: Create "{{ shairport_local_dir }}"
   become: yes
   file:
-    path: "{{ local_dir }}"
+    path: "{{ shairport_local_dir }}"
     state: directory
     owner: root
     group: root
     mode: 0755
 
-- name: Clone shairport-sync release "{{ release }}" to "{{ local_dir }}"
+- name: Clone shairport-sync release "{{ shairport_release }}" to "{{ shairport_local_dir }}"
   become: yes
   git:
-    repo: "{{ repository }}"
-    dest: "{{ local_dir }}"
+    repo: "{{ shairport_repository }}"
+    dest: "{{ shairport_local_dir }}"
     clone: true
     update: true
     force: yes
-    version: "{{ release }}"
+    version: "{{ shairport_release }}"
   register: repository
 
 - name: Run autoreconf
   become: yes
   command: autoreconf -fi
   args:
-    chdir: "{{ local_dir }}"
+    chdir: "{{ shairport_local_dir }}"
   when: repository.changed
 
 # If you need ALAC support you should read this first:
@@ -70,19 +70,19 @@
   command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-metadata --with-soxr --with-systemd
   #command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-metadata --with-soxr --with-systemd --with-apple-alac
   args:
-    chdir: "{{ local_dir }}"
+    chdir: "{{ shairport_local_dir }}"
   when: repository.changed
 
 - name: Build shairport-sync
   become: yes
   make:
-    chdir: "{{ local_dir }}"
+    chdir: "{{ shairport_local_dir }}"
   when: repository.changed
 
 - name: Install shairport-sync
   become: yes
   make:
-    chdir: "{{ local_dir }}"
+    chdir: "{{ shairport_local_dir }}"
     target: install
   when: repository.changed
 
