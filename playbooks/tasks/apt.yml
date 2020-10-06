@@ -18,7 +18,7 @@
   become: yes
   apt:
     name: "{{ os_packages }}"
-    state: present
+    state: latest
 
 - name: Cleanup apt
   become: yes
