@@ -13,8 +13,8 @@
       register: old_kernel
 
 
-    - name: Install log2ram
-      include_tasks: "tasks/log2ram.yml"
+    - name: Modify fstab to log to tmpfs
+      include_tasks: "tasks/fstab.yml"
 
     - name: Update firmware
       include_tasks: "tasks/rpi-firmware.yml"

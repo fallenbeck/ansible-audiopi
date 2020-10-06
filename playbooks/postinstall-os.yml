@@ -34,6 +34,9 @@
       become: yes
 
 
+    - name: Modify /etc/fstab
+      include_tasks: "tasks/fstab.yml"
+
     - name: Update apt and install needed packages
       include_tasks: "tasks/apt.yml"
 
@@ -77,10 +80,6 @@
     - name: Expand filesystem to fill disk
       command: raspi-config --expand-rootfs
       # when: unpartitioned.stdout != "0.00GB"
-
-
-    - name: Install log2ram
-      including_tasks: "tasks/log2ram.yml"
 
 
     # Restart the devices only if new Linux kernel or new software has been installed
