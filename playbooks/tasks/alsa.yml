@@ -1,4 +1,53 @@
 ---
+# Configure ALSA correctly
+
+# The next three changed in /etc/rc.local were suggested here:
+# https://support.hifiberry.com/hc/en-us/community/posts/201493762-Strange-problem-with-my-DAC-
+
+- name: Set PCM volume to 180/215
+  become: yes
+  lineinfile:
+    path: /etc/rc.local
+    regexp: '^amixer cset numid=1'
+    insertbefore: '^exit'
+    line: amixer cset numid=1 180,180
+
+# Here some DSP programs are available:
+# ; Item #0 'FIR interpolation with de-emphasis'
+# ; Item #1 'Low latency IIR with de-emphasis'
+# ; Item #2 'High attenuation with de-emphasis'
+# ; Item #3 'Fixed process flow'
+# ; Item #4 'Ringing-less low latency FIR'
+#
+# Default program is 0
+#
+# "The 2 you can use are FIR interpolation and Low latency IIR. The
+# low-latency IIR is only useful for applications with extremely low
+# latency requirements. For normal use, I recommend to stay with the
+# standard program."
+#
+# For more information on that refer to:
+# https://support.hifiberry.com/hc/en-us/community/posts/201847401-DSP-Programs
+#
+# Docoumentation for the PCM5122 can be found here:
+# https://www.ti.com/lit/ds/symlink/pcm5122.pdf
+
+- name: Set DSP Program to 'Low latency IIR with de-emphasis'
+  become: yes
+  lineinfile:
+    path: /etc/rc.local
+    regexp: '^amixer cset numid=6'
+    insertbefore: '^exit'
+    line: amixer cset numid=6 1
+
+- name: switch de-emphasis off (here on = off for some reason)
+  become: yes
+  lineinfile:
+    path: /etc/rc.local
+    regexp: '^amixer cset numid=5'
+    insertbefore: '^exit'
+    line: amixer cset numid=5 on
+
 - name: Copy asound.conf configuration file
   become: yes
   copy:
@@ -6,16 +55,16 @@
     dest: /etc/asound.conf
     mode: 0644
 
-- name: Set alsa volume (Digital) to 80%
-  become: yes
-  command: amixer sset Digital 80%
+      #- name: Set alsa volume (Digital) to 80%
+      #  become: yes
+      #  command: amixer sset Digital 80%
 
-# - name: Set alsa volume (PCM) to 80%
-#   become: yes
-#   command: amixer sset PCM,0 80%
+      # - name: Set alsa volume (PCM) to 80%
+      #   become: yes
+      #   command: amixer sset PCM,0 80%
 
-- name: Store alsa values
-  become: yes
-  command: alsactl store
+      #- name: Store alsa values
+      #  become: yes
+      #  command: alsactl store
 
 # EOF

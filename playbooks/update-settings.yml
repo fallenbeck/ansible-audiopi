@@ -18,4 +18,7 @@
     - name: Update ALSA settings
       include_tasks: tasks/alsa.yml
 
+    - name: Reboot devices
+      include_tasks: tasks/reboot.yml
+
 # EOF
