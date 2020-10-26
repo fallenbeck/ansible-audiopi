@@ -25,6 +25,9 @@
     - name: Run shairport-sync task to update repository
       include_tasks: "tasks/shairport-sync.yml"
 
+    - name: Update cronjob
+      include_tasks: "tasks/cronjob.yml"
+
 
     # Restart the devices only if new Linux kernel or new software has been installed
     - name: Reboot device
