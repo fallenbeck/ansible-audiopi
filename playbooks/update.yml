@@ -8,16 +8,8 @@
         msg: "This playbook requires Ansible version 2.4 or greater."
 
   tasks:
-    - name: Get old Linux kernel version
-      shell: uname -r
-      register: old_kernel
-
-
     - name: Modify fstab to log to tmpfs
       include_tasks: "tasks/fstab.yml"
-
-    - name: Update firmware
-      include_tasks: "tasks/rpi-firmware.yml"
 
     - name: Install apt packages
       include_tasks: "tasks/apt.yml"
@@ -29,24 +21,8 @@
       include_tasks: "tasks/cronjob.yml"
 
 
-    # Restart the devices only if new Linux kernel or new software has been installed
+    # Restart the devices
     - name: Reboot device
       include_tasks: "tasks/reboot.yml"
 
-
-    # Get the new Linux kernel version if an update has been installed
-    - name: Get new Linux kernel version
-      shell: uname -r
-      register: new_kernel
-      when: firmware.stdout.find("already up to date") == -1
-
-    - name: Linux kernel
-      debug:
-        msg: "Updated Linux kernel version {{ old_kernel.stdout }} to version {{ new_kernel.stdout }}"
-      when: firmware.stdout.find("already up to date") == -1
-
-    - name: Linux kernel
-      debug:
-        msg: "Unchanged Linux kernel version {{ old_kernel.stdout }}"
-      when: firmware.stdout.find("already up to date") != -1
-
+# EOF
