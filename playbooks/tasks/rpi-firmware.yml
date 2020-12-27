@@ -1,9 +1,17 @@
 ---
 # This task updates the Raspberry Pi's firmware
 # using the rpi-update script
+# You can provide a hash value representing a release in rpi-update's github
+# repository page:
+# https://github.com/Hexxeh/rpi-firmware/commits/master?branch=master
+#
+#   Hash                                     |Kernel version |Date
+#   -----------------------------------------+---------------+----------
+#   e1050e94821a70b2e4c72b318d6c6c968552e9a2  4.19.118        27.04.2020
 - name: Update RaspberryPi firmware
   become: yes
-  shell: rpi-update
+  shell: rpi-update e1050e94821a70b2e4c72b318d6c6c968552e9a2
+  #shell: rpi-update
   register: firmware
   ignore_errors: yes
   environment:

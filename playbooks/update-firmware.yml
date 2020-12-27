@@ -1,0 +1,40 @@
+- name: Update firmware of RaspberryPi Airplay Devices
+  hosts: all
+
+  pre_tasks:
+    - name: Check for Ansible version > 2.4
+      assert:
+        that: "ansible_version.full is version_compare('2.4', '>=')"
+        msg: "This playbook requires Ansible version 2.4 or greater."
+
+  tasks:
+    - name: Get old Linux kernel version
+      shell: uname -r
+      register: old_kernel
+
+
+    - name: Update firmware
+      include_tasks: "tasks/rpi-firmware.yml"
+
+
+    # Restart the devices
+    - name: Reboot device
+      include_tasks: "tasks/reboot.yml"
+
+
+    # Get the new Linux kernel version if an update has been installed
+    - name: Get new Linux kernel version
+      shell: uname -r
+      register: new_kernel
+      when: firmware.stdout.find("already up to date") == -1
+
+    - name: Linux kernel
+      debug:
+        msg: "Updated Linux kernel version {{ old_kernel.stdout }} to version {{ new_kernel.stdout }}"
+      when: firmware.stdout.find("already up to date") == -1
+
+    - name: Linux kernel
+      debug:
+        msg: "Unchanged Linux kernel version {{ old_kernel.stdout }}"
+      when: firmware.stdout.find("already up to date") != -1
+
