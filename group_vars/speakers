@@ -8,7 +8,7 @@ shairport_repository: https://github.com/mikebrady/shairport-sync.git
 # Release of shairport-sync to be installed.
 # The releases can be found on the project's release page:
 # https://github.com/mikebrady/shairport-sync/releases
-shairport_release: 3.3.6
+shairport_release: 3.3.8
 
 # Packages to be installed via apt
 # Note that you should add packages here that are needed to build and run
