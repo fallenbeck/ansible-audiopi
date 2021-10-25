@@ -8,9 +8,11 @@
 #   Hash                                     |Kernel version |Date
 #   -----------------------------------------+---------------+----------
 #   e1050e94821a70b2e4c72b318d6c6c968552e9a2  4.19.118        27.04.2020
+#   6e00bda1767c1a96ed0258954228250f0f6da621  5.10.63         06.10.2021
 - name: Update RaspberryPi firmware
   become: yes
-  shell: rpi-update e1050e94821a70b2e4c72b318d6c6c968552e9a2
+    #shell: rpi-update e1050e94821a70b2e4c72b318d6c6c968552e9a2
+  shell: rpi-update 6e00bda1767c1a96ed0258954228250f0f6da621
   #shell: rpi-update
   register: firmware
   ignore_errors: yes
