@@ -1,6 +1,6 @@
 ---
 # Packages to be installed via apt
-# These packages will be installed an every node indepenent from its
+# These packages will be installed an every node independent from its
 # particular role
 os_packages:
     - vim
