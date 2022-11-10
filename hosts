@@ -1,8 +1,8 @@
 # My RaspberryPi-based speakers
 [speakers]
-arbeitszimmer
-esszimmer
-kinderzimmer
+#arbeitszimmer
+fine
+juna
 wohnzimmer
 
 # Devices using the HifiBerry DAC+ shield
@@ -11,8 +11,8 @@ wohnzimmer
 
 # Devices using the HiFiBerry AMP2 shield
 [amp2]
-arbeitszimmer
-esszimmer
-kinderzimmer
+#arbeitszimmer
+fine
+juna
 
 # EOF
