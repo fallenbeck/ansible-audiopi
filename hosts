@@ -1,18 +1,18 @@
 # My RaspberryPi-based speakers
 [speakers]
 #arbeitszimmer
-fine
-juna
-wohnzimmer
+fine.local
+juna.local
+wohnzimmer.local
 
 # Devices using the HifiBerry DAC+ shield
 [dac]
-wohnzimmer
+wohnzimmer.local
 
 # Devices using the HiFiBerry AMP2 shield
 [amp2]
 #arbeitszimmer
-fine
-juna
+fine.local
+juna.local
 
 # EOF
